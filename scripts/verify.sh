@@ -12,6 +12,10 @@ NC='\033[0m'
 
 echo -e "🚀 Starting System Verification..."
 
+# Cleanup previous runs
+pkill collector || true
+pkill api || true
+
 # Check Go
 if ! command -v go &> /dev/null; then
     echo -e "${RED}❌ Go is not installed or not in PATH.${NC}"

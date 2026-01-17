@@ -32,7 +32,7 @@ func NewConsumer(brokers []string, topic string, dbAddr string) (*Consumer, erro
 		Auth: clickhouse.Auth{
 			Database: "logs_db",
 			Username: "default",
-			Password: "",
+			Password: "password",
 		},
 	})
 	if err != nil {

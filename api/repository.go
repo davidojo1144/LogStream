@@ -17,7 +17,7 @@ func NewLogRepository(addr string) (*LogRepository, error) {
 		Auth: clickhouse.Auth{
 			Database: "logs_db",
 			Username: "default",
-			Password: "",
+			Password: "password",
 		},
 	})
 	if err != nil {
