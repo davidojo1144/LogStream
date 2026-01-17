@@ -26,3 +26,17 @@ model ApiKey {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+
+model Log {
+  id        String   @id @default(cuid())
+  timestamp DateTime
+  service   String
+  level     String
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([service])
+  @@index([level])
+}
