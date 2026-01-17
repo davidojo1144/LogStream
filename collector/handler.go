@@ -8,18 +8,32 @@ import (
 )
 
 type LogHandler struct {
-	producer *KafkaProducer
+	producer  *KafkaProducer
+	validator *ApiKeyValidator
 }
 
-func NewLogHandler(producer *KafkaProducer) *LogHandler {
+func NewLogHandler(producer *KafkaProducer, validator *ApiKeyValidator) *LogHandler {
 	return &LogHandler{
-		producer: producer,
+		producer:  producer,
+		validator: validator,
 	}
 }
 
 func (h *LogHandler) HandleLog(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Validate API Key
+	apiKey := r.Header.Get("Authorization")
+	if apiKey == "" {
+		http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	if !h.validator.Validate(apiKey) {
+		http.Error(w, "Invalid API Key", http.StatusUnauthorized)
 		return
 	}
 
@@ -34,9 +48,7 @@ func (h *LogHandler) HandleLog(w http.ResponseWriter, r *http.Request) {
 		entry.Timestamp = time.Now().UTC()
 	}
 
-	// Asynchronously push to Kafka to keep API latency low
-	// In a production system, we might want to handle errors more robustly 
-	// (e.g., local buffer if Kafka is down)
+	// Asynchronously push to Kafka
 	go func(e LogEntry) {
 		if err := h.producer.WriteLog(e); err != nil {
 			log.Printf("Error writing to Kafka: %v", err)

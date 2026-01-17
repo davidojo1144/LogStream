@@ -18,13 +18,21 @@ func main() {
 	kafkaTopic := "logs"
 	serverAddr := ":8080"
 	clickhouseAddr := "localhost:9000"
+	postgresAddr := "postgresql://user:password@localhost:5432/logstream_auth?sslmode=disable"
 
 	// Initialize Kafka Producer
 	producer := NewKafkaProducer(kafkaBrokers, kafkaTopic)
 	defer producer.Close()
 
+	// Initialize API Key Validator
+	validator, err := NewApiKeyValidator(postgresAddr)
+	if err != nil {
+		log.Fatalf("Failed to connect to Postgres for Auth: %v", err)
+	}
+	defer validator.Close()
+
 	// Initialize HTTP Handler
-	handler := NewLogHandler(producer)
+	handler := NewLogHandler(producer, validator)
 
 	// Setup Router
 	mux := http.NewServeMux()
@@ -39,8 +47,7 @@ func main() {
 		Handler: mux,
 	}
 
-	// Start Consumer in a separate goroutine
-	// In a microservices architecture, this would likely be a separate binary
+	// Start Consumer
 	consumer, err := NewConsumer(kafkaBrokers, kafkaTopic, clickhouseAddr)
 	if err != nil {
 		log.Printf("Warning: Failed to start consumer (is ClickHouse running?): %v", err)

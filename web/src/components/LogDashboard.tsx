@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { format, subHours } from "date-fns"
-import { Activity, AlertCircle, RefreshCw, Search, Server, LogOut, Loader2 } from "lucide-react"
+import { Activity, AlertCircle, RefreshCw, Search, Server, LogOut, Loader2, Key } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
 import { DateRange } from "react-day-picker"
+import Link from "next/link"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -141,6 +142,12 @@ export default function LogDashboard() {
         </div>
         <div className="flex items-center gap-4">
           <ModeToggle />
+          <Link href="/api-keys">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Key className="h-4 w-4" />
+              API Keys
+            </Button>
+          </Link>
           <div className="flex items-center gap-2 px-4 py-2 bg-card border rounded-full shadow-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-sm font-medium">{session?.user?.name || "User"}</span>
