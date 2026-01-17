@@ -1,0 +1,29 @@
+# Binaries
+bin/
+*.exe
+*.test
+*.out
+
+# Logs
+*.log
+
+# Vendor
+vendor/
+.tools/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+npm-debug.log
+.next/
+out/
+build/
+
+# Docker
+docker-data/
