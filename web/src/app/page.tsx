@@ -1,18 +1,23 @@
-import LogDashboard from "@/components/LogDashboard";
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
+import LogDashboard from "@/components/LogDashboard"
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession()
+
+  if (!session) {
+    redirect("/login")
+  }
+
   return (
-    <div className="min-h-screen bg-background p-8 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 max-w-7xl mx-auto">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-4xl font-bold tracking-tight">LogStream</h1>
-          <p className="text-muted-foreground text-lg">
-            Distributed Log Aggregator & Visualizer
-          </p>
-        </div>
-        
+    <div className="min-h-screen bg-background font-[family-name:var(--font-geist-sans)] relative overflow-hidden">
+      {/* Background Gradients */}
+      <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
+      
+      <main className="relative z-10">
         <LogDashboard />
       </main>
     </div>
-  );
+  )
 }
