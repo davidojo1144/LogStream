@@ -13,10 +13,11 @@ import (
 func main() {
 	log.Println("Starting Log Collector Service...")
 
-	// Configuration (Environment Variables in a real app)
-	kafkaBrokers := []string{"localhost:9092"} // Assuming running locally for now
+	// Configuration
+	kafkaBrokers := []string{"localhost:9092"}
 	kafkaTopic := "logs"
 	serverAddr := ":8080"
+	clickhouseAddr := "localhost:9000"
 
 	// Initialize Kafka Producer
 	producer := NewKafkaProducer(kafkaBrokers, kafkaTopic)
@@ -36,6 +37,15 @@ func main() {
 	server := &http.Server{
 		Addr:    serverAddr,
 		Handler: mux,
+	}
+
+	// Start Consumer in a separate goroutine
+	// In a microservices architecture, this would likely be a separate binary
+	consumer, err := NewConsumer(kafkaBrokers, kafkaTopic, clickhouseAddr)
+	if err != nil {
+		log.Printf("Warning: Failed to start consumer (is ClickHouse running?): %v", err)
+	} else {
+		go consumer.Start(context.Background())
 	}
 
 	// Graceful Shutdown Channel
