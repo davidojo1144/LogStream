@@ -55,8 +55,9 @@ export default function LogDashboard() {
   if (dateRange?.to) queryParams.set("end_time", dateRange.to.toISOString())
 
   // Fetch Historical Logs
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081"
   const { data: historicalLogs, error, mutate } = useSWR<LogEntry[]>(
-    `http://localhost:8081/logs?${queryParams.toString()}`,
+    `${apiUrl}/logs?${queryParams.toString()}`,
     fetcher,
     {
       refreshInterval: isAutoRefresh && !wsConnected ? 2000 : 0,
@@ -65,7 +66,7 @@ export default function LogDashboard() {
 
   // Fetch Stats for Chart
   const { data: stats } = useSWR<LogStats[]>(
-    `http://localhost:8081/stats?${queryParams.toString()}`,
+    `${apiUrl}/stats?${queryParams.toString()}`,
     fetcher,
     {
       refreshInterval: 5000,
@@ -76,7 +77,8 @@ export default function LogDashboard() {
   useEffect(() => {
     if (!isAutoRefresh) return
 
-    const ws = new WebSocket("ws://localhost:8081/ws")
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8081"
+    const ws = new WebSocket(`${wsUrl}/ws`)
 
     ws.onopen = () => {
       setWsConnected(true)
