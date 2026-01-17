@@ -47,5 +47,18 @@ services:
       - clickhouse_data:/var/lib/clickhouse
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: logstream_auth
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
 volumes:
   clickhouse_data:
+  postgres_data:

@@ -5,11 +5,12 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Lock, Mail, ArrowRight, Loader2 } from "lucide-react"
+import { Lock, User, ArrowRight, Loader2, Mail } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -21,17 +22,34 @@ export default function LoginPage() {
     setLoading(true)
     setError("")
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    })
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      })
 
-    if (res?.error) {
-      setError("Invalid credentials.")
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.message || "Registration failed")
+      }
+
+      // Automatically sign in after registration
+      const signInRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (signInRes?.error) {
+        setError("Account created but failed to auto-login. Please sign in.")
+        setLoading(false)
+      } else {
+        router.push("/")
+      }
+    } catch (err: any) {
+      setError(err.message)
       setLoading(false)
-    } else {
-      router.push("/")
     }
   }
 
@@ -53,17 +71,30 @@ export default function LoginPage() {
            
           <div className="flex flex-col items-center gap-6 mb-8">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
-              <Lock className="w-8 h-8 text-white" />
+              <User className="w-8 h-8 text-white" />
             </div>
             <div className="text-center">
               <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-                Welcome Back
+                Create Account
               </h1>
-              <p className="text-muted-foreground mt-2">Sign in to access LogStream</p>
+              <p className="text-muted-foreground mt-2">Join LogStream today</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <div className="relative group">
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  type="text"
+                  placeholder="Full Name"
+                  className="pl-9 bg-background/50 border-border/50 focus:bg-background transition-all"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
             <div className="space-y-2">
               <div className="relative group">
                 <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
@@ -110,14 +141,14 @@ export default function LoginPage() {
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  Sign In <ArrowRight className="w-4 h-4 ml-2" />
+                  Sign Up <ArrowRight className="w-4 h-4 ml-2" />
                 </>
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Don't have an account? <Link href="/register" className="text-primary hover:underline">Sign up</Link></p>
+            <p>Already have an account? <Link href="/login" className="text-primary hover:underline">Sign in</Link></p>
           </div>
         </div>
       </motion.div>
