@@ -35,7 +35,10 @@ fi
 
 # 2. Start Services (Only if Docker is present)
 echo "▶️  Starting Infrastructure..."
-docker-compose up -d
+docker compose up -d
+
+echo "⏳ Waiting for services to be ready (30s)..."
+sleep 30
 
 echo "▶️  Starting Collector (Port 8080)..."
 ./bin/collector > collector.log 2>&1 &
