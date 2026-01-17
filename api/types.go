@@ -15,7 +15,13 @@ type LogEntry struct {
 type LogQuery struct {
 	Service   string    `json:"service"`
 	Level     string    `json:"level"`
+	Search    string    `json:"search"`
 	StartTime time.Time `json:"start_time"`
 	EndTime   time.Time `json:"end_time"`
 	Limit     int       `json:"limit"`
+}
+
+type LogStats struct {
+	Timestamp time.Time `json:"timestamp"`
+	Count     uint64    `json:"count"`
 }

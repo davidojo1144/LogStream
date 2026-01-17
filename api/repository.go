@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 )
@@ -32,23 +33,6 @@ func NewLogRepository(addr string) (*LogRepository, error) {
 }
 
 func (r *LogRepository) GetLogs(ctx context.Context, q LogQuery) ([]LogEntry, error) {
-	query := `
-		SELECT timestamp, service, level, message, metadata
-		FROM logs_db.logs
-		WHERE timestamp >= $1 AND timestamp <= $2
-	`
-	args := []interface{}{q.StartTime, q.EndTime}
-
-	if q.Service != "" {
-		query += " AND service = $3"
-		args = append(args, q.Service)
-	}
-	
-	// Note: Simple query builder. In production, use a builder lib or be careful with args index
-	// Here we just append. ClickHouse driver uses $1, $2, etc.
-	// Actually, let's just keep it simple and safe.
-	// Re-building for correct parameter indexing:
-	
 	finalQuery := `SELECT timestamp, service, level, message, metadata FROM logs_db.logs WHERE timestamp >= ? AND timestamp <= ?`
 	queryArgs := []interface{}{q.StartTime, q.EndTime}
 
@@ -60,6 +44,11 @@ func (r *LogRepository) GetLogs(ctx context.Context, q LogQuery) ([]LogEntry, er
 	if q.Level != "" {
 		finalQuery += " AND level = ?"
 		queryArgs = append(queryArgs, q.Level)
+	}
+
+	if q.Search != "" {
+		finalQuery += " AND message ILIKE ?"
+		queryArgs = append(queryArgs, "%"+q.Search+"%")
 	}
 
 	finalQuery += " ORDER BY timestamp DESC LIMIT ?"
@@ -81,4 +70,38 @@ func (r *LogRepository) GetLogs(ctx context.Context, q LogQuery) ([]LogEntry, er
 	}
 
 	return logs, nil
+}
+
+func (r *LogRepository) GetStats(ctx context.Context, q LogQuery) ([]LogStats, error) {
+	// Aggregate logs per minute
+	query := `
+		SELECT toStartOfMinute(timestamp) as time_bucket, count() as count
+		FROM logs_db.logs
+		WHERE timestamp >= ? AND timestamp <= ?
+	`
+	args := []interface{}{q.StartTime, q.EndTime}
+
+	if q.Service != "" {
+		query += " AND service = ?"
+		args = append(args, q.Service)
+	}
+
+	query += " GROUP BY time_bucket ORDER BY time_bucket ASC"
+
+	rows, err := r.conn.Query(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var stats []LogStats
+	for rows.Next() {
+		var s LogStats
+		if err := rows.Scan(&s.Timestamp, &s.Count); err != nil {
+			return nil, err
+		}
+		stats = append(stats, s)
+	}
+
+	return stats, nil
 }

@@ -29,6 +29,8 @@ func main() {
 	// Setup Router
 	mux := http.NewServeMux()
 	mux.HandleFunc("/logs", handler.GetLogs)
+	mux.HandleFunc("/stats", handler.GetStats)
+	mux.HandleFunc("/ws", handler.WebSocketHandler)
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
