@@ -22,7 +22,7 @@ func NewConsumer(brokers []string, topic string, dbAddr string) (*Consumer, erro
 		Brokers:  brokers,
 		Topic:    topic,
 		GroupID:  "logstream-group",
-		MinBytes: 10e3, // 10KB
+		MinBytes: 1,    // Fetch immediately
 		MaxBytes: 10e6, // 10MB
 	})
 
