@@ -44,8 +44,6 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function LogDashboard() {
   const { data: session } = useSession()
-  const { toast } = useToast()
-  const [isLogoutOpen, setIsLogoutOpen] = useState(false)
   const [serviceFilter, setServiceFilter] = useState("")
   const [levelFilter, setLevelFilter] = useState("")
   const [searchFilter, setSearchFilter] = useState("")
@@ -56,6 +54,7 @@ export default function LogDashboard() {
   const [isAutoRefresh, setIsAutoRefresh] = useState(true)
   const [wsConnected, setWsConnected] = useState(false)
   const [realtimeLogs, setRealtimeLogs] = useState<LogEntry[]>([])
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false)
 
   // Query Params Construction
   const queryParams = new URLSearchParams({ limit: "100" })
@@ -165,13 +164,50 @@ export default function LogDashboard() {
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-sm font-medium">{session?.user?.name || "User"}</span>
           </div>
-          <Button variant="outline" size="icon" onClick={() => {
-            if (window.confirm("Are you sure you want to logout?")) {
-              signOut()
-            }
-          }}>
+
+          <Button variant="outline" size="icon" onClick={() => setIsLogoutOpen(true)}>
             <LogOut className="h-4 w-4" />
           </Button>
+
+          {/* Custom Logout Modal */}
+          <AnimatePresence>
+            {isLogoutOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setIsLogoutOpen(false)}
+                  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+                />
+                
+                {/* Modal */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                  className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-background border rounded-xl shadow-xl z-50 p-6 space-y-4"
+                >
+                  <div className="space-y-2">
+                    <h2 className="text-xl font-semibold">Confirm Logout</h2>
+                    <p className="text-muted-foreground">
+                      Are you sure you want to sign out? You will need to log in again to access the dashboard.
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button variant="outline" onClick={() => setIsLogoutOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={() => signOut()}>
+                      Log Out
+                    </Button>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
