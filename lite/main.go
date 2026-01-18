@@ -83,8 +83,17 @@ func main() {
 	http.HandleFunc("/logs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		// Implement simple query from Postgres
-		// ... (omitted for brevity, assume simple SELECT)
-		w.Write([]byte(`[]`)) // Placeholder
+		// For Lite mode, we can implement a basic SELECT
+		// But for now, returning empty array is better than 404
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`[]`))
+	})
+
+	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+		// Mock stats for now to prevent 404
+		w.Write([]byte(`[]`))
 	})
 
 	http.HandleFunc("/ws", handleWebSocket)
