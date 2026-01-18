@@ -159,15 +159,17 @@ func main() {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
 
-		// Aggregate logs by minute for the last 60 minutes
+		// Aggregate logs by minute for the last 24 hours (increased window)
 		// This is a simple aggregation for the "Log Volume" chart
 		query := `
 			SELECT date_trunc('minute', timestamp) as minute, count(*) as count
 			FROM "Log"
-			WHERE timestamp > NOW() - INTERVAL '1 hour'
+			WHERE timestamp > NOW() - INTERVAL '24 hours'
 			GROUP BY minute
 			ORDER BY minute ASC
 		`
+		
+		log.Printf("Executing Stats Query: %s", query)
 		
 		rows, err := pgProducer.db.Query(query)
 		if err != nil {
