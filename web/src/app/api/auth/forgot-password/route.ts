@@ -4,10 +4,10 @@ import { Resend } from "resend"
 import crypto from "crypto"
 
 const prisma = new PrismaClient()
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY)
     const { email } = await req.json()
 
     // 1. Check if user exists
