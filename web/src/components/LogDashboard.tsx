@@ -44,6 +44,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function LogDashboard() {
   const { data: session } = useSession()
+  const { toast } = useToast()
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false)
   const [serviceFilter, setServiceFilter] = useState("")
   const [levelFilter, setLevelFilter] = useState("")
   const [searchFilter, setSearchFilter] = useState("")
