@@ -88,9 +88,6 @@ export default function ForgotPasswordPage() {
               <div className="p-4 bg-green-500/10 text-green-600 rounded-lg border border-green-500/20">
                 If an account exists for <strong>{email}</strong>, you will receive password reset instructions shortly.
               </div>
-              <p className="text-sm text-muted-foreground">
-                (This is a demo simulation. No email was actually sent.)
-              </p>
             </motion.div>
           )}
 
