@@ -28,18 +28,6 @@ import {
 } from "@/components/ui/dialog"
 
 interface LogEntry {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
-interface LogEntry {
   timestamp: string
   service: string
   level: string
