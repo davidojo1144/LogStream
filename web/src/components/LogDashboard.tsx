@@ -17,6 +17,18 @@ import { cn } from "@/lib/utils"
 import { LogChart } from "@/components/LogChart"
 import { DatePickerWithRange } from "@/components/date-range-picker"
 import { AlertsDialog } from "@/components/AlertsDialog"
+import { useToast } from "@/components/ui/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface LogEntry {
   timestamp: string
@@ -154,26 +166,13 @@ export default function LogDashboard() {
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-sm font-medium">{session?.user?.name || "User"}</span>
           </div>
-          
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  You will need to sign in again to access your logs.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => signOut()}>Logout</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button variant="outline" size="icon" onClick={() => {
+            if (window.confirm("Are you sure you want to logout?")) {
+              signOut()
+            }
+          }}>
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
