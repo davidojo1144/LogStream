@@ -84,14 +84,49 @@ func main() {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
 
-		// Basic query implementation for Lite Mode
-		// In a real production app, use prepared statements with robust filtering
-		rows, err := pgProducer.db.Query(`
-			SELECT timestamp, service, level, message, metadata 
-			FROM "Log" 
-			ORDER BY timestamp DESC 
-			LIMIT 100
-		`)
+		// Parse Query Params
+		query := r.URL.Query()
+		service := query.Get("service")
+		level := query.Get("level")
+		search := query.Get("search")
+		startTime := query.Get("start_time")
+		endTime := query.Get("end_time")
+
+		// Build SQL Query
+		sql := `SELECT timestamp, service, level, message, metadata FROM "Log" WHERE 1=1`
+		var args []interface{}
+		argId := 1
+
+		if service != "" {
+			sql += fmt.Sprintf(" AND service = $%d", argId)
+			args = append(args, service)
+			argId++
+		}
+		if level != "" {
+			sql += fmt.Sprintf(" AND level = $%d", argId)
+			args = append(args, level)
+			argId++
+		}
+		if search != "" {
+			sql += fmt.Sprintf(" AND message ILIKE $%d", argId)
+			args = append(args, "%"+search+"%")
+			argId++
+		}
+		if startTime != "" {
+			sql += fmt.Sprintf(" AND timestamp >= $%d", argId)
+			args = append(args, startTime)
+			argId++
+		}
+		if endTime != "" {
+			sql += fmt.Sprintf(" AND timestamp <= $%d", argId)
+			args = append(args, endTime)
+			argId++
+		}
+
+		sql += " ORDER BY timestamp DESC LIMIT 100"
+
+		// Execute Query
+		rows, err := pgProducer.db.Query(sql, args...)
 		if err != nil {
 			log.Printf("Error querying logs: %v", err)
 			http.Error(w, "Failed to fetch logs", http.StatusInternalServerError)
