@@ -158,8 +158,44 @@ func main() {
 	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
-		// Mock stats for now to prevent 404
-		w.Write([]byte(`[]`))
+
+		// Aggregate logs by minute for the last 60 minutes
+		// This is a simple aggregation for the "Log Volume" chart
+		query := `
+			SELECT date_trunc('minute', timestamp) as minute, count(*) as count
+			FROM "Log"
+			WHERE timestamp > NOW() - INTERVAL '1 hour'
+			GROUP BY minute
+			ORDER BY minute ASC
+		`
+		
+		rows, err := pgProducer.db.Query(query)
+		if err != nil {
+			log.Printf("Error querying stats: %v", err)
+			http.Error(w, "Failed to fetch stats", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		type Stat struct {
+			Timestamp time.Time `json:"timestamp"`
+			Count     int       `json:"count"`
+		}
+		var stats []Stat
+
+		for rows.Next() {
+			var s Stat
+			if err := rows.Scan(&s.Timestamp, &s.Count); err != nil {
+				continue
+			}
+			stats = append(stats, s)
+		}
+
+		if stats == nil {
+			stats = []Stat{}
+		}
+
+		json.NewEncoder(w).Encode(stats)
 	})
 
 	http.HandleFunc("/ws", handleWebSocket)
