@@ -82,11 +82,41 @@ func main() {
 	// 2. API HANDLERS (Read from Postgres)
 	http.HandleFunc("/logs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		// Implement simple query from Postgres
-		// For Lite mode, we can implement a basic SELECT
-		// But for now, returning empty array is better than 404
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`[]`))
+
+		// Basic query implementation for Lite Mode
+		// In a real production app, use prepared statements with robust filtering
+		rows, err := pgProducer.db.Query(`
+			SELECT timestamp, service, level, message, metadata 
+			FROM "Log" 
+			ORDER BY timestamp DESC 
+			LIMIT 100
+		`)
+		if err != nil {
+			log.Printf("Error querying logs: %v", err)
+			http.Error(w, "Failed to fetch logs", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		var logs []LogEntry
+		for rows.Next() {
+			var l LogEntry
+			var metadataBytes []byte
+			if err := rows.Scan(&l.Timestamp, &l.Service, &l.Level, &l.Message, &metadataBytes); err != nil {
+				continue
+			}
+			if len(metadataBytes) > 0 {
+				json.Unmarshal(metadataBytes, &l.Metadata)
+			}
+			logs = append(logs, l)
+		}
+
+		if logs == nil {
+			logs = []LogEntry{}
+		}
+
+		json.NewEncoder(w).Encode(logs)
 	})
 
 	http.HandleFunc("/stats", func(w http.ResponseWriter, r *http.Request) {
