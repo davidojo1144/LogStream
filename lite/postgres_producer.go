@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 // PostgresProducer implements the Producer interface but writes directly to Postgres
@@ -16,7 +17,17 @@ type PostgresProducer struct {
 }
 
 func NewPostgresProducer(connStr string) (*PostgresProducer, error) {
-	db, err := sql.Open("postgres", connStr)
+	// Force simple protocol for Supabase Transaction Mode compatibility
+	// This prevents "prepared statement does not exist" errors
+	if !strings.Contains(connStr, "default_query_exec_mode") {
+		if strings.Contains(connStr, "?") {
+			connStr += "&default_query_exec_mode=simple_protocol"
+		} else {
+			connStr += "?default_query_exec_mode=simple_protocol"
+		}
+	}
+
+	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to postgres: %w", err)
 	}
