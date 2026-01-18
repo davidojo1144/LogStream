@@ -19,6 +19,15 @@ import { DatePickerWithRange } from "@/components/date-range-picker"
 import { AlertsDialog } from "@/components/AlertsDialog"
 import { useToast } from "@/components/ui/use-toast"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+
+interface LogEntry {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -166,30 +175,13 @@ export default function LogDashboard() {
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-sm font-medium">{session?.user?.name || "User"}</span>
           </div>
-
-          <Dialog open={isLogoutOpen} onOpenChange={setIsLogoutOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Confirm Logout</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to sign out? You will need to log in again to access the dashboard.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="gap-2 sm:gap-0">
-                <Button variant="outline" onClick={() => setIsLogoutOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={() => signOut()}>
-                  Log Out
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button variant="outline" size="icon" onClick={() => {
+            if (window.confirm("Are you sure you want to logout?")) {
+              signOut()
+            }
+          }}>
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
