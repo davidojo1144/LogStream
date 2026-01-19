@@ -37,8 +37,9 @@ export async function POST(req: NextRequest) {
     })
 
     // 4. Send Email
-    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`
-    console.log("Sending email to:", email) // DEBUG
+    const baseUrl = process.env.NEXTAUTH_URL || `https://${process.env.VERCEL_URL}` || "http://localhost:3000"
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`
+    console.log("Sending email to:", email, "Reset URL:", resetUrl) // DEBUG
 
     const { data, error } = await resend.emails.send({
       from: "LogStream <onboarding@resend.dev>",
