@@ -48,7 +48,7 @@ export default function LogDashboard() {
   const [levelFilter, setLevelFilter] = useState("")
   const [searchFilter, setSearchFilter] = useState("")
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subHours(new Date(), 1),
+    from: subHours(new Date(), 48),
     to: new Date(),
   })
   const [isAutoRefresh, setIsAutoRefresh] = useState(true)
