@@ -1,98 +1,76 @@
-# 🚀 LogStream - Distributed Log Aggregation Platform
+# 🌊 LogStream
 
-LogStream is a high-performance, real-time observability platform designed to handle high-throughput log ingestion, processing, and visualization. Built with scalability and modern engineering practices in mind.
+![LogStream Banner](https://placehold.co/1200x400/1e1e1e/FFF?text=LogStream+Dashboard&font=montserrat)
 
-![LogStream Dashboard](https://raw.githubusercontent.com/davidojo1144/LogStream/main/screenshots/dashboard.png)
-*(Note: You can add a screenshot here later)*
+**LogStream** is a lightweight, real-time distributed log aggregation platform designed for developers who need instant visibility into their applications.
 
-## 🌟 Key Features
+Built with **Go (Golang)** for high-performance ingestion and **Next.js** for a reactive, real-time dashboard.
 
-- **⚡ Real-Time Streaming:** Watch logs arrive instantly via WebSockets (Matrix-style).
-- **🛡️ Secure Ingestion:** API Key authentication middleware ensuring only authorized apps can send logs.
-- **📊 Visual Analytics:** Interactive charts for log volume, error rates, and service distribution.
-- **🔍 Full-Text Search:** Powered by ClickHouse for sub-second filtering across millions of logs.
-- **🚨 Alerting System:** Configure rules to get notified about spikes in errors or traffic.
-- **🏗️ Microservices Ready:** Designed to aggregate logs from distributed systems (Python, Node, Go, etc.).
+---
+
+## 🚀 Features
+
+-   **⚡ Real-time Streaming:** Watch logs arrive instantly via WebSockets.
+-   **🔍 Powerful Filtering:** Filter by service, log level (INFO, ERROR, WARN), or search keywords.
+-   **🛡️ Secure:** API Key authentication for log ingestion.
+-   **📊 Visual Insights:** Interactive charts showing log volume and error rates over time.
+-   **☁️ Free to Deploy:** Runs perfectly on the free tiers of Vercel (Frontend), Render (Backend), and Supabase (Database).
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Go (Golang) - High-concurrency ingestion and API.
-- **Message Queue:** Apache Kafka - Decouples ingestion from processing for backpressure handling.
-- **Database:** ClickHouse - Columnar database for blazing-fast analytical queries.
-- **Auth Database:** PostgreSQL (Prisma) - User management and API Keys.
-- **Frontend:** Next.js 14, Tailwind CSS, shadcn/ui, Recharts.
-- **Communication:** HTTP (Ingest), WebSockets (Stream), gRPC (Internal - optional).
+-   **Backend:** Go (Golang), Gorilla WebSockets
+-   **Frontend:** Next.js 14, TypeScript, Tailwind CSS, Shadcn UI
+-   **Database:** PostgreSQL (Supabase)
+-   **Deployment:** Docker, Render, Vercel
 
-## 🏗️ Architecture
+---
 
-```mermaid
-graph LR
-    A[Client Apps] -->|HTTP POST + API Key| B(Go Collector)
-    B -->|Validate & Buffer| C[Apache Kafka]
-    C -->|Consume Batch| D(Go Processor)
-    D -->|Insert| E[(ClickHouse)]
-    
-    F[Next.js Dashboard] -->|HTTP GET| G(Go API)
-    G -->|Query| E
-    G -->|WebSocket Stream| F
-    
-    B -->|Auth Check| H[(Postgres)]
-```
+## 🏁 Getting Started
 
-## 🚀 Getting Started
+### 1. Deploy Your Own
+Follow our **[Free Deployment Guide](DEPLOY_FREE.md)** to set up your own instance in under 10 minutes for $0.
 
-### Prerequisites
-- Docker & Docker Compose
-- Go 1.21+
-- Node.js 18+
+### 2. Local Development
 
-### 1. Start Infrastructure
-Spin up Kafka, ClickHouse, Zookeeper, and Postgres:
+**Prerequisites:**
+-   Go 1.21+
+-   Node.js 18+
+-   Docker (optional, for local DB)
+
+**Backend:**
 ```bash
-docker-compose up -d
+# Clone the repo
+git clone https://github.com/davidojo1144/LogStream.git
+cd LogStream
+
+# Run the Lite Server (Ingestor + API)
+go run lite/*.go
 ```
 
-### 2. Build & Run Backend
-Compile the Collector and API services:
-```bash
-# Build binaries
-cd api && go build -o ../bin/api .
-cd ../collector && go build -o ../bin/collector .
-
-# Run Collector (Port 8080)
-./bin/collector
-
-# Run API (Port 8081)
-./bin/api
-```
-
-### 3. Run Frontend
-Start the Next.js dashboard:
+**Frontend:**
 ```bash
 cd web
 npm install
 npm run dev
 ```
-Visit **http://localhost:3000** to see the dashboard.
 
-## 🔑 Usage
+Visit `http://localhost:3000` to see the dashboard!
 
-1.  **Sign Up:** Create an account on the dashboard.
-2.  **Generate Key:** Go to the "API Keys" section and create a new ingestion key.
-3.  **Send Logs:** Use the key to send logs from your applications.
+---
 
-### Example (cURL)
-```bash
-curl -X POST http://localhost:8080/ingest \
-  -H "Authorization: Bearer <YOUR_API_KEY>" \
-  -H "Content-Type: application/json" \
-  -d '{"service":"payment-api", "level":"error", "message":"Transaction failed"}'
-```
+## 📚 Documentation
 
-See [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) for Python, Node.js, and Go examples.
+-   **[User Guide & API Reference](USER_GUIDE.md)** - How to send logs from your apps.
+-   **[Deployment Guide](DEPLOY_FREE.md)** - Host it for free.
+
+---
 
 ## 🤝 Contributing
+
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
-MIT
+
+This project is open-source and available under the [MIT License](LICENSE).
