@@ -12,6 +12,11 @@ function ResetPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
+  
+  // Debug logging
+  console.log("ResetPassword Page Debug:")
+  console.log("Full URL:", typeof window !== 'undefined' ? window.location.href : 'SSR')
+  console.log("Token from params:", token)
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")

@@ -159,19 +159,43 @@ func main() {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
 
-		// Aggregate logs by minute for the last 24 hours (increased window)
-		// This is a simple aggregation for the "Log Volume" chart
-		query := `
+		// Parse Query Params
+		query := r.URL.Query()
+		startTime := query.Get("start_time")
+		endTime := query.Get("end_time")
+
+		// Aggregate logs by minute
+		sql := `
 			SELECT date_trunc('minute', timestamp) as minute, count(*) as count
 			FROM "Log"
-			WHERE timestamp > NOW() - INTERVAL '24 hours'
+			WHERE 1=1
+		`
+		var args []interface{}
+		argId := 1
+
+		if startTime != "" {
+			sql += fmt.Sprintf(" AND timestamp >= $%d", argId)
+			args = append(args, startTime)
+			argId++
+		} else {
+			// Default to 24 hours if no start time provided
+			sql += " AND timestamp > NOW() - INTERVAL '24 hours'"
+		}
+
+		if endTime != "" {
+			sql += fmt.Sprintf(" AND timestamp <= $%d", argId)
+			args = append(args, endTime)
+			argId++
+		}
+
+		sql += `
 			GROUP BY minute
 			ORDER BY minute ASC
 		`
 		
-		log.Printf("Executing Stats Query: %s", query)
+		log.Printf("Executing Stats Query: %s params: %v", sql, args)
 		
-		rows, err := pgProducer.db.Query(query)
+		rows, err := pgProducer.db.Query(sql, args...)
 		if err != nil {
 			log.Printf("Error querying stats: %v", err)
 			http.Error(w, "Failed to fetch stats", http.StatusInternalServerError)
