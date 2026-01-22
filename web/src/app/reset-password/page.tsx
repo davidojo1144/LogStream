@@ -20,9 +20,13 @@ function ResetPasswordContent() {
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [manualToken, setManualToken] = useState("") // New state for manual token entry
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
+
+  // Use token from URL or manual entry
+  const effectiveToken = token || manualToken
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +39,7 @@ function ResetPasswordContent() {
       return
     }
 
-    if (!token) {
+    if (!effectiveToken) {
       setError("Invalid or missing reset token")
       setLoading(false)
       return
@@ -45,7 +49,7 @@ function ResetPasswordContent() {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ token: effectiveToken, password }),
       })
 
       if (res.ok) {
@@ -109,12 +113,33 @@ function ResetPasswordContent() {
           </div>
         </div>
 
+        {/* Manual Token Entry (only if token is missing) */}
+        {!token && (
+          <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-dashed border-border">
+             <p className="text-xs text-muted-foreground mb-2 text-center">
+               Token missing from URL? Paste it here:
+             </p>
+             <Input
+               type="text"
+               placeholder="Paste token here..."
+               value={manualToken}
+               onChange={(e) => setManualToken(e.target.value)}
+               className="text-center font-mono text-sm"
+             />
+          </div>
+        )}
+
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mb-6 p-3 rounded-lg bg-destructive/10 text-destructive text-sm text-center border border-destructive/20"
+          >
+            {error}
+          </motion.div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
-              {error}
-            </div>
-          )}
 
           <div className="space-y-4">
             <div className="relative group">

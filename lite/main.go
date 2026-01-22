@@ -71,6 +71,9 @@ func main() {
 		go func() {
 			if err := pgProducer.WriteLog(entry); err != nil {
 				log.Printf("Error writing log: %v", err)
+			} else {
+				// Debug log for successful write (can be noisy, maybe limit it or remove later)
+				// log.Printf("Successfully wrote log: %s", entry.Message)
 			}
 			// Broadcast to WebSockets
 			broadcastLog(entry)
@@ -125,6 +128,8 @@ func main() {
 		}
 
 		sql += " ORDER BY timestamp DESC LIMIT 100"
+
+		log.Printf("Executing Logs Query: %s params: %v", sql, args)
 
 		// Execute Query
 		rows, err := pgProducer.db.Query(sql, args...)
