@@ -1,11 +1,164 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { ArrowLeft, Book, Code, Terminal, Activity, Shield, Zap, Globe, ArrowRight } from "lucide-react"
+import { ArrowLeft, Book, Code, Terminal, Activity, Shield, Zap, Globe, ArrowRight, Copy, Check } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
+
+const SDK_EXAMPLES = {
+  typescript: `// logger.ts
+export class LogStream {
+  private url = "https://logstream-backend.onrender.com/ingest";
+  
+  constructor(private apiKey: string, private serviceName: string) {}
+
+  async log(level: "info" | "warn" | "error" | "debug", message: string, metadata?: Record<string, any>) {
+    try {
+      await fetch(this.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": this.apiKey
+        },
+        body: JSON.stringify({
+          service: this.serviceName,
+          level,
+          message,
+          metadata
+        })
+      });
+    } catch (error) {
+      console.error("Failed to send log to LogStream:", error);
+    }
+  }
+}
+
+// Usage
+const logger = new LogStream("YOUR_API_KEY", "my-app");
+logger.log("info", "User logged in", { userId: "123" });`,
+
+  python: `# logger.py
+import requests
+import json
+import threading
+
+class LogStream:
+    def __init__(self, api_key, service_name):
+        self.url = "https://logstream-backend.onrender.com/ingest"
+        self.api_key = api_key
+        self.service_name = service_name
+
+    def log(self, level, message, metadata=None):
+        def send():
+            try:
+                payload = {
+                    "service": self.service_name,
+                    "level": level,
+                    "message": message,
+                    "metadata": metadata or {}
+                }
+                requests.post(
+                    self.url,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": self.api_key
+                    },
+                    data=json.dumps(payload),
+                    timeout=5
+                )
+            except Exception as e:
+                print(f"Failed to send log: {e}")
+
+        # Send asynchronously to avoid blocking main thread
+        threading.Thread(target=send).start()
+
+# Usage
+logger = LogStream("YOUR_API_KEY", "my-python-app")
+logger.log("error", "Database connection failed", {"db_host": "localhost"})`,
+
+  go: `// logger.go
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"log"
+	"net/http"
+)
+
+type LogStream struct {
+	ApiKey      string
+	ServiceName string
+	Client      *http.Client
+}
+
+func NewLogStream(apiKey, serviceName string) *LogStream {
+	return &LogStream{
+		ApiKey:      apiKey,
+		ServiceName: serviceName,
+		Client:      &http.Client{},
+	}
+}
+
+func (l *LogStream) Log(level, message string, metadata map[string]string) {
+	go func() {
+		payload := map[string]interface{}{
+			"service":  l.ServiceName,
+			"level":    level,
+			"message":  message,
+			"metadata": metadata,
+		}
+		data, _ := json.Marshal(payload)
+
+		req, _ := http.NewRequest("POST", "https://logstream-backend.onrender.com/ingest", bytes.NewBuffer(data))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", l.ApiKey)
+
+		_, err := l.Client.Do(req)
+		if err != nil {
+			log.Printf("Failed to send log: %v", err)
+		}
+	}()
+}
+
+// Usage
+func main() {
+    logger := NewLogStream("YOUR_API_KEY", "my-go-service")
+    logger.Log("warn", "Cache miss", map[string]string{"key": "user:123"})
+}`
+}
+
+function CodeBlock({ code, language }: { code: string; language: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="relative group">
+      <div className="absolute right-2 top-2 z-10">
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-8 w-8 bg-muted/80 backdrop-blur-sm hover:bg-muted"
+          onClick={copyToClipboard}
+        >
+          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+        </Button>
+      </div>
+      <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+        <pre className="text-foreground/80">{code}</pre>
+      </div>
+    </div>
+  )
+}
 
 export default function DocumentationPage() {
   const fadeIn = {
@@ -86,6 +239,47 @@ export default function DocumentationPage() {
           </Card>
         </motion.section>
 
+        {/* Client SDKs */}
+        <motion.section 
+          initial="hidden" 
+          whileInView="show" 
+          viewport={{ once: true }}
+          variants={fadeIn}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-2">
+            <Code className="w-5 h-5 text-blue-500" />
+            <h2 className="text-2xl font-semibold">Client SDK Starter Kits</h2>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Ready-to-use Libraries</CardTitle>
+              <CardDescription>
+                Copy and paste these snippets to start logging from your applications in minutes.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="typescript" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-4">
+                  <TabsTrigger value="typescript">TypeScript / Node.js</TabsTrigger>
+                  <TabsTrigger value="python">Python</TabsTrigger>
+                  <TabsTrigger value="go">Go (Golang)</TabsTrigger>
+                </TabsList>
+                <TabsContent value="typescript">
+                  <CodeBlock code={SDK_EXAMPLES.typescript} language="typescript" />
+                </TabsContent>
+                <TabsContent value="python">
+                  <CodeBlock code={SDK_EXAMPLES.python} language="python" />
+                </TabsContent>
+                <TabsContent value="go">
+                  <CodeBlock code={SDK_EXAMPLES.go} language="go" />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </motion.section>
+
         {/* Integration Guide */}
         <motion.section 
           initial="hidden" 
@@ -113,19 +307,19 @@ export default function DocumentationPage() {
                 </p>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
-                    <Badge variant="outline">service</Badge>
+                    <Badge>service</Badge>
                     <span className="text-muted-foreground">Name of the service sending the log (e.g., &quot;auth-service&quot;)</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Badge variant="outline">level</Badge>
+                    <Badge>level</Badge>
                     <span className="text-muted-foreground">Log level: &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;, &quot;debug&quot;</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Badge variant="outline">message</Badge>
+                    <Badge>message</Badge>
                     <span className="text-muted-foreground">The main log content/message</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Badge variant="outline">metadata</Badge>
+                    <Badge>metadata</Badge>
                     <span className="text-muted-foreground">(Optional) Key-value pairs for extra context</span>
                   </li>
                 </ul>
