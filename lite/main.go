@@ -67,17 +67,15 @@ func main() {
 			entry.Timestamp = time.Now().UTC()
 		}
 
-		// Write to Postgres
-		go func() {
-			if err := pgProducer.WriteLog(entry); err != nil {
-				log.Printf("Error writing log: %v", err)
-			} else {
-				// Debug log for successful write (can be noisy, maybe limit it or remove later)
-				// log.Printf("Successfully wrote log: %s", entry.Message)
-			}
-			// Broadcast to WebSockets
-			broadcastLog(entry)
-		}()
+		// Write to Postgres SYNCHRONOUSLY to catch errors
+		if err := pgProducer.WriteLog(entry); err != nil {
+			log.Printf("Error writing log to DB: %v", err)
+			http.Error(w, "Failed to write log to database", http.StatusInternalServerError)
+			return
+		}
+
+		// Broadcast to WebSockets (Async is fine here)
+		go broadcastLog(entry)
 
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte(`{"status":"accepted"}`))

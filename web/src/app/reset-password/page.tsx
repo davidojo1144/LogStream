@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowLeft, Loader2, Lock, KeyRound } from "lucide-react"
+import { ArrowLeft, Loader2, Lock, KeyRound, Eye, EyeOff } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -20,13 +20,10 @@ function ResetPasswordContent() {
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [manualToken, setManualToken] = useState("") // New state for manual token entry
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
-
-  // Use token from URL or manual entry
-  const effectiveToken = token || manualToken
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,8 +36,8 @@ function ResetPasswordContent() {
       return
     }
 
-    if (!effectiveToken) {
-      setError("Invalid or missing reset token")
+    if (!token) {
+      setError("Invalid link. Please request a new password reset email.")
       setLoading(false)
       return
     }
@@ -49,7 +46,7 @@ function ResetPasswordContent() {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: effectiveToken, password }),
+        body: JSON.stringify({ token, password }),
       })
 
       if (res.ok) {
@@ -113,19 +110,15 @@ function ResetPasswordContent() {
           </div>
         </div>
 
-        {/* Manual Token Entry (only if token is missing) */}
+        {/* Manual Token Entry removed as per user request */}
         {!token && (
-          <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-dashed border-border">
-             <p className="text-xs text-muted-foreground mb-2 text-center">
-               Token missing from URL? Paste it here:
+          <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-dashed border-border text-center">
+             <p className="text-sm text-muted-foreground">
+               No reset token found in URL.
              </p>
-             <Input
-               type="text"
-               placeholder="Paste token here..."
-               value={manualToken}
-               onChange={(e) => setManualToken(e.target.value)}
-               className="text-center font-mono text-sm"
-             />
+             <p className="text-xs text-muted-foreground mt-1">
+               Please click the link in your email again.
+             </p>
           </div>
         )}
 
@@ -140,30 +133,47 @@ function ResetPasswordContent() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <div className="space-y-4">
-            <div className="relative group">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-              <Input
-                type="password"
-                placeholder="New Password"
-                className="pl-9 bg-background/50 border-border/50 focus:bg-background transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="password">
+                New Password
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="bg-background/50 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="relative group">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="confirmPassword">
+                Confirm Password
+              </label>
               <Input
+                id="confirmPassword"
                 type="password"
-                placeholder="Confirm Password"
-                className="pl-9 bg-background/50 border-border/50 focus:bg-background transition-all"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
                 required
-                minLength={6}
+                className="bg-background/50"
               />
             </div>
           </div>

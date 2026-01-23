@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import useSWR from "swr"
-import { format, subHours } from "date-fns"
+import { format, subDays } from "date-fns"
 import { Activity, AlertCircle, RefreshCw, Search, Server, LogOut, Loader2, Key } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
@@ -47,8 +47,9 @@ export default function LogDashboard() {
   const [serviceFilter, setServiceFilter] = useState("")
   const [levelFilter, setLevelFilter] = useState("")
   const [searchFilter, setSearchFilter] = useState("")
+  // Default to 7 days to ensure logs are visible
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subHours(new Date(), 48),
+    from: subDays(new Date(), 7),
     to: new Date(),
   })
   const [isAutoRefresh, setIsAutoRefresh] = useState(true)
