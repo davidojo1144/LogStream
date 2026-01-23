@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { format, subDays } from "date-fns"
-import { Activity, AlertCircle, RefreshCw, Search, Server, LogOut, Loader2, Key } from "lucide-react"
+import { Activity, AlertCircle, RefreshCw, Search, Server, LogOut, Loader2, Key, Book } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { signOut, useSession } from "next-auth/react"
 import { DateRange } from "react-day-picker"
@@ -152,6 +152,12 @@ export default function LogDashboard() {
         </div>
         <div className="flex items-center gap-4">
           <ModeToggle />
+          <Link href="/docs">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Book className="h-4 w-4" />
+              Docs
+            </Button>
+          </Link>
           <Link href="/api-keys">
             <Button variant="outline" size="sm" className="gap-2">
               <Key className="h-4 w-4" />

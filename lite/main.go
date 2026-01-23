@@ -181,8 +181,9 @@ func main() {
 			args = append(args, startTime)
 			argId++
 		} else {
-			// Default to 24 hours if no start time provided
-			sql += " AND timestamp > NOW() - INTERVAL '24 hours'"
+			// If no start time provided (All Time), default to last 30 days to ensure chart has data
+			// but doesn't try to aggregate years of data by minute
+			sql += " AND timestamp > NOW() - INTERVAL '30 days'"
 		}
 
 		if endTime != "" {
