@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const LogStreamURL = "http://localhost:8080/ingest"
+const LogStreamURL = "https://logstream-backend.onrender.com/ingest"
 
 type LogPayload struct {
 	Service  string            `json:"service"`

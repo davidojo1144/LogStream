@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const LOGSTREAM_URL = "http://localhost:8080/ingest";
+const LOGSTREAM_URL = "https://logstream-backend.onrender.com/ingest";
 const SERVICE_NAME = "node-demo-service";
 
 async function sendLog(level, message, metadata = {}) {

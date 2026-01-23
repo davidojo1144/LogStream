@@ -3,7 +3,7 @@ import time
 import random
 
 # Configuration
-LOGSTREAM_URL = "http://localhost:8080/ingest"
+LOGSTREAM_URL = "https://logstream-backend.onrender.com/ingest"
 SERVICE_NAME = "python-demo-service"
 
 def send_log(level, message, metadata=None):
