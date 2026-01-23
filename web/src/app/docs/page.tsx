@@ -342,20 +342,22 @@ export default function DocumentationPage() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="typescript" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4">
-                  <TabsTrigger value="typescript">TypeScript / Node.js</TabsTrigger>
-                  <TabsTrigger value="python">Python</TabsTrigger>
-                  <TabsTrigger value="go">Go (Golang)</TabsTrigger>
+                <TabsList className="flex flex-col md:grid md:grid-cols-3 h-auto gap-2 bg-muted/50 p-1">
+                  <TabsTrigger value="typescript" className="w-full justify-center">TypeScript</TabsTrigger>
+                  <TabsTrigger value="python" className="w-full justify-center">Python</TabsTrigger>
+                  <TabsTrigger value="go" className="w-full justify-center">Go</TabsTrigger>
                 </TabsList>
-                <TabsContent value="typescript">
-                  <CodeBlock code={SDK_EXAMPLES.typescript} language="typescript" />
-                </TabsContent>
-                <TabsContent value="python">
-                  <CodeBlock code={SDK_EXAMPLES.python} language="python" />
-                </TabsContent>
-                <TabsContent value="go">
-                  <CodeBlock code={SDK_EXAMPLES.go} language="go" />
-                </TabsContent>
+                <div className="mt-4">
+                  <TabsContent value="typescript" className="mt-0">
+                    <CodeBlock code={SDK_EXAMPLES.typescript} language="typescript" />
+                  </TabsContent>
+                  <TabsContent value="python" className="mt-0">
+                    <CodeBlock code={SDK_EXAMPLES.python} language="python" />
+                  </TabsContent>
+                  <TabsContent value="go" className="mt-0">
+                    <CodeBlock code={SDK_EXAMPLES.go} language="go" />
+                  </TabsContent>
+                </div>
               </Tabs>
             </CardContent>
           </Card>
