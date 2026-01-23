@@ -323,15 +323,15 @@ export default function LogDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="rounded-2xl border bg-card/50 backdrop-blur-sm shadow-sm overflow-hidden"
+        className="rounded-2xl border bg-card/50 backdrop-blur-sm shadow-sm overflow-hidden relative"
       >
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-muted/30 text-muted-foreground border-b">
+            <thead className="bg-muted/50 text-muted-foreground border-b backdrop-blur-md sticky top-0 z-20">
               <tr>
-                <th className="px-6 py-4 font-medium w-48">Timestamp</th>
-                <th className="px-6 py-4 font-medium w-32">Level</th>
-                <th className="px-6 py-4 font-medium w-48">Service</th>
+                <th className="px-6 py-4 font-medium w-48 whitespace-nowrap">Timestamp</th>
+                <th className="px-6 py-4 font-medium w-32 whitespace-nowrap">Level</th>
+                <th className="px-6 py-4 font-medium w-48 whitespace-nowrap">Service</th>
                 <th className="px-6 py-4 font-medium">Message</th>
               </tr>
             </thead>
@@ -344,15 +344,15 @@ export default function LogDashboard() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ duration: 0.2 }}
-                    className="hover:bg-muted/30 transition-colors"
+                    className="hover:bg-muted/30 transition-colors group"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground font-mono text-xs">
+                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground font-mono text-xs group-hover:text-foreground transition-colors">
                       {format(new Date(log.timestamp), "MMM dd HH:mm:ss.SSS")}
                     </td>
                     <td className="px-6 py-4">
                       <Badge
                         className={cn(
-                          "uppercase text-[10px] px-2 py-1 shadow-sm",
+                          "uppercase text-[10px] px-2 py-1 shadow-sm transition-transform group-hover:scale-105",
                           log.level === "error" && "bg-red-500/10 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900",
                           log.level === "warn" && "bg-yellow-500/10 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-900",
                           log.level === "info" && "bg-blue-500/10 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900",
@@ -364,11 +364,11 @@ export default function LogDashboard() {
                     </td>
                     <td className="px-6 py-4 font-medium">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
                         {log.service}
                       </div>
                     </td>
-                    <td className="px-6 py-4 max-w-xl truncate text-foreground/80" title={log.message}>
+                    <td className="px-6 py-4 max-w-xl truncate text-foreground/80 group-hover:text-foreground transition-colors" title={log.message}>
                       {log.message}
                     </td>
                   </motion.tr>

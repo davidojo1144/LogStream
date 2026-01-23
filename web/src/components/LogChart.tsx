@@ -7,10 +7,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  CartesianGrid,
-  defs,
-  linearGradient,
-  stop
+  CartesianGrid
 } from "recharts"
 import { format } from "date-fns"
 import { useTheme } from "next-themes"
@@ -24,6 +21,8 @@ interface LogChartProps {
   data: LogStats[]
 }
 
+import { motion } from "framer-motion"
+
 export function LogChart({ data }: LogChartProps) {
   const { theme } = useTheme()
   const isDark = theme === "dark"
@@ -34,7 +33,12 @@ export function LogChart({ data }: LogChartProps) {
   }))
 
   return (
-    <div className="h-[300px] w-full">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="h-[300px] w-full"
+    >
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData}>
           <defs>
@@ -81,6 +85,6 @@ export function LogChart({ data }: LogChartProps) {
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </motion.div>
   )
 }
