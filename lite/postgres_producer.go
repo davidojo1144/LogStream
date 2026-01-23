@@ -53,7 +53,7 @@ func (p *PostgresProducer) WriteLog(entry LogEntry) error {
 	// Generate a simple timestamp-based ID for lite mode
 	id := fmt.Sprintf("log_%d", time.Now().UnixNano())
 
-	_, err = p.db.Exec(query, id, entry.Timestamp, entry.Service, entry.Level, entry.Message, metadataJson)
+	_, err = p.db.Exec(query, id, entry.Timestamp, entry.Service, entry.Level, entry.Message, string(metadataJson))
 	if err != nil {
 		// Enhanced Error Logging
 		return fmt.Errorf("failed to insert log to postgres. Query: %s, Error: %w", query, err)
