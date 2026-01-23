@@ -132,6 +132,87 @@ func main() {
 }`
 }
 
+const INTEGRATION_EXAMPLES = {
+  fetch: `// api-client.ts
+import { LogStream } from "./logger"; // Import the class from above
+
+const logger = new LogStream("YOUR_API_KEY", "frontend-app");
+
+// This wrapper automatically logs requests and errors for you
+export async function apiRequest(url: string, options?: RequestInit) {
+  const start = performance.now();
+  const method = options?.method || "GET";
+
+  try {
+    // 1. Log the attempt (INFO)
+    logger.log("info", \`API Request: \${method} \${url}\`);
+
+    const response = await fetch(url, options);
+    const duration = Math.round(performance.now() - start);
+
+    if (!response.ok) {
+        // 2. Automatically log API errors (ERROR)
+        logger.log("error", \`API Error \${response.status}: \${url}\`, { 
+          status: String(response.status),
+          duration: \`\${duration}ms\`
+        });
+        throw new Error(\`HTTP \${response.status}\`);
+    }
+
+    // 3. Automatically log slow requests (WARN)
+    if (duration > 1000) {
+        logger.log("warn", \`Slow Request: \${url}\`, { 
+          duration: \`\${duration}ms\` 
+        });
+    }
+
+    return response;
+  } catch (error) {
+    // 4. Log network failures (ERROR)
+    logger.log("error", \`Network Failed: \${url}\`, { 
+      error: String(error) 
+    });
+    throw error;
+  }
+}
+
+// Usage in your app:
+// Instead of fetch('/api/user'), you use:
+// await apiRequest('/api/user');
+// 
+// Result: LogStream automatically receives logs for every call!`,
+
+  react: `// ErrorBoundary.tsx
+import React, { Component, ErrorInfo } from "react";
+import { LogStream } from "./logger";
+
+const logger = new LogStream("YOUR_API_KEY", "react-app");
+
+export class GlobalErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(_: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Automatically log UI crashes to LogStream
+    logger.log("error", "UI Crash: Uncaught Exception", {
+      error: error.message,
+      stack: errorInfo.componentStack
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong. Engineers have been notified.</h1>;
+    }
+
+    return this.props.children;
+  }
+}`
+}
+
 function CodeBlock({ code, language }: { code: string; language: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -274,6 +355,53 @@ export default function DocumentationPage() {
                 </TabsContent>
                 <TabsContent value="go">
                   <CodeBlock code={SDK_EXAMPLES.go} language="go" />
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </motion.section>
+
+        {/* Real-world Patterns */}
+        <motion.section 
+          initial="hidden" 
+          whileInView="show" 
+          viewport={{ once: true }}
+          variants={fadeIn}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-yellow-500" />
+            <h2 className="text-2xl font-semibold">Automatic Integration Patterns</h2>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>How to Log Automatically</CardTitle>
+              <CardDescription>
+                Instead of manually calling <code>logger.log()</code> everywhere, use these patterns to capture events automatically.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="fetch" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="fetch">Smart Fetch Wrapper</TabsTrigger>
+                  <TabsTrigger value="react">React Error Boundary</TabsTrigger>
+                </TabsList>
+                <TabsContent value="fetch">
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Replace your native <code>fetch</code> calls with this wrapper. It automatically logs successful requests, catches network errors, and warns you about slow APIs.
+                    </p>
+                    <CodeBlock code={INTEGRATION_EXAMPLES.fetch} language="typescript" />
+                  </div>
+                </TabsContent>
+                <TabsContent value="react">
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Wrap your main App component with this Error Boundary. It will catch any React rendering crash and send the stack trace to LogStream.
+                    </p>
+                    <CodeBlock code={INTEGRATION_EXAMPLES.react} language="typescript" />
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
