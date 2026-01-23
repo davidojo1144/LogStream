@@ -55,7 +55,8 @@ func (p *PostgresProducer) WriteLog(entry LogEntry) error {
 
 	_, err = p.db.Exec(query, id, entry.Timestamp, entry.Service, entry.Level, entry.Message, metadataJson)
 	if err != nil {
-		return fmt.Errorf("failed to insert log to postgres: %w", err)
+		// Enhanced Error Logging
+		return fmt.Errorf("failed to insert log to postgres. Query: %s, Error: %w", query, err)
 	}
 
 	return nil
