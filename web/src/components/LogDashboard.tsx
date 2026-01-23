@@ -47,11 +47,8 @@ export default function LogDashboard() {
   const [serviceFilter, setServiceFilter] = useState("")
   const [levelFilter, setLevelFilter] = useState("")
   const [searchFilter, setSearchFilter] = useState("")
-  // Default to 7 days to ensure logs are visible
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
-    to: new Date(),
-  })
+  // Default to undefined (All Time) as per user request
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [isAutoRefresh, setIsAutoRefresh] = useState(true)
   const [wsConnected, setWsConnected] = useState(false)
   const [realtimeLogs, setRealtimeLogs] = useState<LogEntry[]>([])
