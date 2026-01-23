@@ -135,12 +135,12 @@ export default function LogDashboard() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 p-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+          <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
             LogStream
           </h1>
-          <p className="text-muted-foreground mt-1 flex items-center gap-2">
+          <p className="text-muted-foreground mt-1 flex items-center gap-2 text-sm md:text-base">
             Distributed Log Aggregator
             {wsConnected && (
               <span className="flex items-center gap-1 text-xs text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
@@ -150,26 +150,26 @@ export default function LogDashboard() {
             )}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 w-full lg:w-auto">
           <ModeToggle />
           <Link href="/docs">
             <Button variant="outline" size="sm" className="gap-2">
               <Book className="h-4 w-4" />
-              Docs
+              <span className="hidden sm:inline">Docs</span>
             </Button>
           </Link>
           <Link href="/api-keys">
             <Button variant="outline" size="sm" className="gap-2">
               <Key className="h-4 w-4" />
-              API Keys
+              <span className="hidden sm:inline">API Keys</span>
             </Button>
           </Link>
-          <div className="flex items-center gap-2 px-4 py-2 bg-card border rounded-full shadow-sm">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm font-medium">{session?.user?.name || "User"}</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-card border rounded-full shadow-sm max-w-[150px] md:max-w-none">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+            <span className="text-sm font-medium truncate">{session?.user?.name || "User"}</span>
           </div>
 
-          <Button variant="outline" size="icon" onClick={() => setIsLogoutOpen(true)}>
+          <Button variant="outline" size="icon" onClick={() => setIsLogoutOpen(true)} className="shrink-0">
             <LogOut className="h-4 w-4" />
           </Button>
 

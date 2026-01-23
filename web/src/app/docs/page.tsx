@@ -257,7 +257,7 @@ export default function DocumentationPage() {
           variants={fadeIn}
           className="space-y-4"
         >
-          <div className="flex items-center gap-2 mb-8">
+          <div className="flex items-center gap-2 mb-6 md:mb-8">
             <Link href="/">
               <Button variant="ghost" className="gap-2 pl-0 hover:pl-2 transition-all">
                 <ArrowLeft className="w-4 h-4" />
@@ -266,13 +266,13 @@ export default function DocumentationPage() {
             </Link>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             <div className="p-3 bg-primary/10 rounded-xl">
               <Book className="w-8 h-8 text-primary" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">Documentation</h1>
-              <p className="text-muted-foreground text-lg mt-1">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Documentation</h1>
+              <p className="text-muted-foreground text-base md:text-lg mt-1">
                 Learn how to integrate and use LogStream.
               </p>
             </div>
@@ -383,9 +383,9 @@ export default function DocumentationPage() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="fetch" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="fetch">Smart Fetch Wrapper</TabsTrigger>
-                  <TabsTrigger value="react">React Error Boundary</TabsTrigger>
+                <TabsList className="flex flex-col h-auto sm:grid sm:grid-cols-2 w-full mb-4 gap-1 sm:gap-0">
+                  <TabsTrigger value="fetch" className="w-full">Smart Fetch Wrapper</TabsTrigger>
+                  <TabsTrigger value="react" className="w-full">React Error Boundary</TabsTrigger>
                 </TabsList>
                 <TabsContent value="fetch">
                   <div className="space-y-4">
