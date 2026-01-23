@@ -34,7 +34,7 @@ import json
 API_KEY = "pk_your_api_key_here"
 
 def log(level, message, metadata=None):
-    url = "http://localhost:8080/ingest"
+    url = "https://logstream-backend.onrender.com/ingest"
     headers = {"Authorization": f"Bearer {API_KEY}"}
     payload = {
         "service": "python-backend",
@@ -75,7 +75,7 @@ async function log(level, message, metadata = {}) {
 
 ### 3. cURL (Terminal)
 ```bash
-curl -X POST http://localhost:8080/ingest \
+curl -X POST https://logstream-backend.onrender.com/ingest \
   -H "Authorization: Bearer pk_your_api_key_here" \
   -H "Content-Type: application/json" \
   -d '{"service":"cron-job", "level":"info", "message":"Backup completed"}'
